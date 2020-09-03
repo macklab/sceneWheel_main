@@ -310,7 +310,29 @@
             timeline: timeline,           
             preload_images: preload_images,                        
             on_finish: function() {
-                // jsPsych.data.displayData();                       
+                // jsPsych.data.displayData();   
+
+                // get data values
+                var data = {experiment:"sceneWheel_main",
+                            repo:"sceneWheel_main",
+                            data:jsPsych.data.get().values(),
+                            browser_info:browser_info,
+                            interaction_data:jsPsych.data.getInteractionData().values(),
+                            exp_condition:condition}
+
+                // send data to savejs
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
+                xhr.setRequestHeader('Content-Type','application/json');
+                xhr.onload = function(){
+                  if(xhr.status==200){
+                    var response=JSON.parse(xhr.responseText);
+                    console.log(response.success);
+                  }
+                };
+                xhr.send(JSON.stringify(data));   
+
+                // send data to firebase                      
                 var tmp = new Uint32Array(1);
                 tmp = window.crypto.getRandomValues(tmp)
                 var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
