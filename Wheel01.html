@@ -38,13 +38,13 @@
     <script type="text/javascript">
         // Firebase set up
         var firebaseConfig = {
-            apiKey: "AIzaSyDzm34TvHIIM5XlogGROBAw73QtJL1rCQ8",
-            authDomain: "jspsychtest-bdfa9.firebaseapp.com",
-            databaseURL: "https://jspsychtest-bdfa9.firebaseio.com",
-            projectId: "jspsychtest-bdfa9",
-            storageBucket: "jspsychtest-bdfa9.appspot.com",
-            messagingSenderId: "245975298959",
-            appId: "1:245975298959:web:35b0bcd10e33577cf611fa"
+            apiKey: "AIzaSyBdaTj6S3xND2qG0_HUN1rrF0GWUh5EP1c",
+            authDomain: "scenewheel-main.firebaseapp.com",
+            databaseURL: "https://scenewheel-main.firebaseio.com",
+            projectId: "scenewheel-main",
+            storageBucket: "scenewheel-main.appspot.com",
+            messagingSenderId: "611149998558",
+            appId: "1:611149998558:web:3650c2da774e6c7433d54f"
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -261,29 +261,29 @@
 
         // * timeline fill up * //  
         timeline = [];      
-        timeline.push(consent_inst);
-        timeline.push(consent_page);        
-        // full screen mode        
-        timeline.push({
-            type: 'fullscreen',
-            fullscreen_mode: true,
-            data: {disp_type: 'fullscreen_enter'}
-        });
-        timeline.push(general_instruction);
-        timeline.push(practice_block);
-        timeline.push(start_main);
-        for (b=0; b<n_block-1; b++) {          
-            timeline.push(eval('main_block'+(b+1)));
-            timeline.push(test_break);
-        }
-        timeline.push(eval('main_block'+(n_block)));
-        timeline.push(demographic_page);
-        // fullscreen out
-        timeline.push({
-            type: 'fullscreen',
-            fullscreen_mode: false,
-            data: {disp_type: 'fullscreen_out'}
-        });        
+        // timeline.push(consent_inst);
+        // timeline.push(consent_page);        
+        // // full screen mode        
+        // timeline.push({
+        //     type: 'fullscreen',
+        //     fullscreen_mode: true,
+        //     data: {disp_type: 'fullscreen_enter'}
+        // });
+        // timeline.push(general_instruction);
+        // timeline.push(practice_block);
+        // timeline.push(start_main);
+        // for (b=0; b<n_block-1; b++) {          
+        //     timeline.push(eval('main_block'+(b+1)));
+        //     timeline.push(test_break);
+        // }
+        // timeline.push(eval('main_block'+(n_block)));
+        // timeline.push(demographic_page);
+        // // fullscreen out
+        // timeline.push({
+        //     type: 'fullscreen',
+        //     fullscreen_mode: false,
+        //     data: {disp_type: 'fullscreen_out'}
+        // });        
         timeline.push(debrief_page);    
         timeline.push(exp_over);
 
