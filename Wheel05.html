@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang = 'en'>
+    <head>
+        <title>Experiment - Indoor scene memory</title>
+        <style>
+                                   
+            #stim_arena {
+                position: absolute;                
+                left: 0;
+                top: 0;        
+                width: 100%;
+                height: 100%;                
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }        
+        
+        </style>
+        <script src='jspsych-6.1.0/jspsych.js'></script>
+        <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>        
+        <script src="https://cdn.jsdelivr.net/npm/bowser@2.5.3/es5.min.js"></script>        
+        <script src="js_library/modernizr-custom.js"></script>  
+        <script src="js_library/underscore-min.js"></script>        
+        <script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
+        <script src='jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js'></script>
+        <script src='jspsych-6.1.0/plugins/jspsych-html-button-response.js'></script>
+        <script src='jspsych-6.1.0/plugins/jspsych-mouse-reconstruction.js'></script> 
+        <script src="jspsych-6.1.0/plugins/jspsych-external-html.js"></script>              
+        <script src="js_library/make_condition.js"></script>                      
+        <link href='jspsych-6.1.0/css/jspsych.css' rel='stylesheet' type="text/css">
+        <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>         
+    </head>
+    <body></body>
+
+    <script type="text/javascript">
+        // Firebase set up
+        var firebaseConfig = {
+            apiKey: "AIzaSyDzm34TvHIIM5XlogGROBAw73QtJL1rCQ8",
+            authDomain: "jspsychtest-bdfa9.firebaseapp.com",
+            databaseURL: "https://jspsychtest-bdfa9.firebaseio.com",
+            projectId: "jspsychtest-bdfa9",
+            storageBucket: "jspsychtest-bdfa9.appspot.com",
+            messagingSenderId: "245975298959",
+            appId: "1:245975298959:web:35b0bcd10e33577cf611fa"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    
+        // login anonymous user
+        firebase.auth().signInAnonymously().catch(function(error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+        });
+        
+  
+    </script>
+
+    <script>
+        
+        // * browser info * //        
+        const browser = bowser.getParser(window.navigator.userAgent);
+        var browser_info = browser.getBrowser();
+               
+        // * image host * //
+        const img_host = '';//'https://macklab.dev/resources/sceneWheel/';
+
+        // * condition set up * //  
+        const n_radius = 5;
+        const n_bin_onWheel = 18;
+        const n_repetition = 3;
+        const n_block = 5;           
+        var condition = make_condition(n_radius, n_bin_onWheel, n_repetition, n_block);
+        
+        
+        // * wheel info * //        
+        var wheel_number = '05';
+
+
+        // * preload memory items, and indicator handles *//        
+        var memory_item = [];
+        for (b=0; b <n_block; b++){
+            for (i = 0; i < condition[b].length; i++) {
+                memory_item.push(
+                    img_host+'sceneWheel_imgs'+
+                    '/Wheel'+wheel_number+
+                    '/wheel'+wheel_number+'_r'+condition[b][i]['radius']+
+                    '/'+condition[b][i]['scene_num']+'.webp'
+                );            
+            }
+        }        
+        var handle_bar = 'materials/handle_wheel.png';
+        var handle_nobar = 'materials/noBar_wheel.png';
+        var inst_img = [];
+        for (i=0; i<5; i++){
+            inst_img.push(img_host+'instruction_difficulty/Slide'+(i+1)+'.jpeg');
+        }
+        var preload_images = [memory_item, handle_bar, handle_nobar, inst_img];
+
+        
+        // ************** Display set up *************** //
+        // * Consent * //
+        var consent_inst = {
+            type: 'html-button-response',
+            stimulus: html='<p style="color: black; font-size: 20px;">'
+                +'We would like to get your consent before starting the experiment.</p>',
+            choices: ['Consent page'], 
+            data: {disp_type: 'consent-instruction'}
+        }
+        var check_consent = function(elem) {
+            if (document.getElementById('radio_agree').checked) {                             
+                return true;
+            } else {
+                alert("If you wish to participate, you must check the box next to the statement 'I agree.'");
+                return false;
+            }
+            return false;
+        };
+        var consent_page = {
+            type: 'external-html',
+            url: "materials/online_consent.html",
+            cont_btn: "start",
+            check_fn: check_consent,
+            data: {disp_type: 'online_consent_form'}
+        }        
+
+        // * Instruction * //        
+        var general_instruction = {
+            type: 'instructions',
+            pages: [
+                '<img src="'+inst_img[0]+'" style="width:90%">',
+                '<img src="'+inst_img[1]+'" style="width:90%">',
+                '<img src="'+inst_img[2]+'" style="width:90%">',
+                '<img src="'+inst_img[3]+'" style="width:90%">',
+                '<img src="'+inst_img[4]+'" style="width:90%">'
+            ],
+            show_clickable_nav: true,
+            show_page_number: true,
+            data: {disp_type: 'general_instruction'}
+        }         
+        
+        // * Trial composition * //
+        var ITI = { 
+            type: 'html-keyboard-response',
+            stimulus: '<div id="stim_arena" style="font-size:24px;">+</div>',
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 1000,
+            data: {
+                disp_type: 'ITI',
+                wheel_num: wheel_number
+            }
+        }
+        var memory_display = {
+            type: 'html-keyboard-response',
+            stimulus: function(){                                
+                var html ='<div id="stim_arena">'+
+                '<img src="'+img_host+'sceneWheel_imgs'+
+                '/Wheel'+wheel_number+
+                '/wheel'+wheel_number+'_r'+jsPsych.timelineVariable('radius',true)+
+                '/'+jsPsych.timelineVariable('scene_num',true)+'.webp" '+
+                'style="width:20%"></div>'                   
+                return html;
+            },          
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 1000,
+            data: {
+                disp_type: 'memory_display',
+                wheel_num: wheel_number,
+                radius: jsPsych.timelineVariable('radius')
+            }
+        }        
+        var test_display = {           
+            type: 'mouse-reconstruction', // containing retention interval in the plugin
+            div_name: 'stim_arena',            
+            starting_value: 360,
+            current_wheel: wheel_number,
+            current_radius: jsPsych.timelineVariable('radius'),
+            data: {
+                disp_type: 'test_display',
+                wheel_num: wheel_number,
+                radius: jsPsych.timelineVariable('radius'),
+                answer: jsPsych.timelineVariable('scene_num')           
+            }        
+        }
+
+        // * practice block * //
+        var practice_block = {
+            timeline: [ITI, memory_display, test_display],
+            timeline_variables: [
+                { radius: '02', scene_num: '000000'},
+                { radius: '04', scene_num: '000072'},
+                { radius: '08', scene_num: '000144'},
+                { radius: '16', scene_num: '000216'},
+                { radius: '32', scene_num: '000288'}
+            ],
+            randomize_order: true            
+        }
+
+        // * start main block * //
+        var start_main = {
+            type: 'html-button-response',
+            stimulus: html = '<p style="color: black; font-size: 20px;">'
+                +'Practice trials are done!</br>'
+                +'Click the <i>Start</i> button to start the main experiment.</br></br>'
+                +'The main experiment consists of '+(n_radius*n_bin_onWheel*n_repetition) +' trials.</br>'
+                +'A short break will be given every '+(n_radius*n_bin_onWheel*n_repetition/n_block) + ' trials.',
+            choices: ['Start'],                  
+            data: {disp_type: 'start-mainExp'}
+        }
+        
+        // * main blocks * //   
+        for(b=0; b<n_block; b++){
+            this['main_block'+(b+1)] = {
+                timeline: [ITI, memory_display, test_display],
+                timeline_variables: condition[b],
+                randomize_order: true
+            }
+        }
+
+        // * break time * //
+        var test_break = {
+            type: 'html-button-response',
+            stimulus: '<p style="color: black; font-size: 20px;">Take a break, and press the button to start again.</p>',
+            choices: ['Start'],                  
+            data: {disp_type: 'test-break'}
+        }
+
+        // * demographic page  * //
+        var demographic_page = {
+            type: 'html-button-response',
+            stimulus: html='<p style="color: black; font-size: 20px;">'
+                +'You are done! But do not close this page until instructed.</br></br>'
+                +'Now we would like to collect your demographic information.</br>'
+                +'Click the <b>Demographic questions</b> below to complete the questionnaires.</br>'
+                +'After completing the questionnaires, please <b>come back</b> to this page and press <b>Done</b> at the bottom.</br></br>'
+                +'<a href="https://redcap.utoronto.ca/surveys/index.php?s=DDT8ME9KFL&study_name=scene_wheel_difficulty_check" target="_blank">'
+                +'Demographic questions </a></br></br></p>',
+            choices: ['Done'], 
+            data: {disp_type: 'demographic-link'}        
+        }
+        
+        // * Debriefing form * //       
+        var debrief_page = {
+            type: 'external-html',
+            url: "materials/debriefing_letter.html",
+            cont_btn: "finish",            
+            data: {disp_type: 'debriefing_page'}
+        }
+        
+        // * Experiment End * //
+        var exp_over = {
+            type: 'html-keyboard-response',
+            stimulus: '<p style="color: black; font-size: 20px;">You can close this page. Thank you!</p>',
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 2000,
+            data: {disp_type: 'exp-done'}
+        }
+        
+
+        // * timeline fill up * //  
+        timeline = [];      
+        timeline.push(consent_inst);
+        timeline.push(consent_page);        
+        // full screen mode        
+        timeline.push({
+            type: 'fullscreen',
+            fullscreen_mode: true,
+            data: {disp_type: 'fullscreen_enter'}
+        });
+        timeline.push(general_instruction);
+        timeline.push(practice_block);
+        timeline.push(start_main);
+        for (b=0; b<n_block-1; b++) {          
+            timeline.push(eval('main_block'+(b+1)));
+            timeline.push(test_break);
+        }
+        timeline.push(eval('main_block'+(n_block)));
+        timeline.push(demographic_page);
+        // fullscreen out
+        timeline.push({
+            type: 'fullscreen',
+            fullscreen_mode: false,
+            data: {disp_type: 'fullscreen_out'}
+        });        
+        timeline.push(debrief_page);    
+        timeline.push(exp_over);
+
+        // * for non-webp browsers * //
+        var webp = Modernizr.webp;       
+        if(!webp){
+            var webp_warning = {
+                type: 'html-keyboard-response',
+                stimulus: '<p style="color: black; font-size: 20px;">'
+                    +'Your browser does not support the webp image format,<br> '
+                    +'which means that you will not be able to complete the experiment.<br>'
+                    +'Browsers that support the webp include '
+                    +'Chrome, Firefox, IE, Edge, etc (not Safari).',
+                choices: jsPsych.NO_KEYS,
+                trial_duration: 10000,
+                data: {disp_type: 'webp_warning'}
+            }
+            var timeline = [webp_warning];
+            var preload_images = [handle_bar]; // radomly load            
+        }
+       
+        jsPsych.init({
+            // exclusions: { webp: true },    
+            timeline: timeline,           
+            preload_images: preload_images,                        
+            on_finish: function() {
+                // jsPsych.data.displayData();                       
+                var tmp = new Uint32Array(1);
+                tmp = window.crypto.getRandomValues(tmp)
+                var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
+                firebase.database().ref(dbpath).set({
+                    data: [
+                        browser_info,
+                        condition,
+                        jsPsych.data.get().values(), 
+                        jsPsych.data.getInteractionData().values()
+                        ],
+                    study: 'sceneWheel',
+                    date: Date()
+                });
+            }
+        });      
+       
+    
+
+   </script>
+
+</html>
+    
+
+    
+
+       
+
