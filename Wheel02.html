@@ -31,20 +31,20 @@
         <link href='jspsych-6.1.0/css/jspsych.css' rel='stylesheet' type="text/css">
         <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>        
+        <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>       
     </head>
     <body></body>
 
     <script type="text/javascript">
         // Firebase set up
         var firebaseConfig = {
-            apiKey: "AIzaSyDzm34TvHIIM5XlogGROBAw73QtJL1rCQ8",
-            authDomain: "jspsychtest-bdfa9.firebaseapp.com",
-            databaseURL: "https://jspsychtest-bdfa9.firebaseio.com",
-            projectId: "jspsychtest-bdfa9",
-            storageBucket: "jspsychtest-bdfa9.appspot.com",
-            messagingSenderId: "245975298959",
-            appId: "1:245975298959:web:35b0bcd10e33577cf611fa"
+            apiKey: "AIzaSyBdaTj6S3xND2qG0_HUN1rrF0GWUh5EP1c",
+            authDomain: "scenewheel-main.firebaseapp.com",
+            databaseURL: "https://scenewheel-main.firebaseio.com",
+            projectId: "scenewheel-main",
+            storageBucket: "scenewheel-main.appspot.com",
+            messagingSenderId: "611149998558",
+            appId: "1:611149998558:web:3650c2da774e6c7433d54f"
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -271,21 +271,21 @@
         });
         timeline.push(general_instruction);
         timeline.push(practice_block);
-        timeline.push(start_main);
-        for (b=0; b<n_block-1; b++) {          
-            timeline.push(eval('main_block'+(b+1)));
-            timeline.push(test_break);
-        }
-        timeline.push(eval('main_block'+(n_block)));
-        timeline.push(demographic_page);
+        // timeline.push(start_main);
+        // for (b=0; b<n_block-1; b++) {          
+        //     timeline.push(eval('main_block'+(b+1)));
+        //     timeline.push(test_break);
+        // }
+        // timeline.push(eval('main_block'+(n_block)));
         // fullscreen out
         timeline.push({
             type: 'fullscreen',
             fullscreen_mode: false,
             data: {disp_type: 'fullscreen_out'}
-        });        
-        timeline.push(debrief_page);    
-        timeline.push(exp_over);
+        }); 
+        timeline.push(demographic_page);               
+        timeline.push(debrief_page);  
+        
 
         // * for non-webp browsers * //
         var webp = Modernizr.webp;       
@@ -310,7 +310,29 @@
             timeline: timeline,           
             preload_images: preload_images,                        
             on_finish: function() {
-                // jsPsych.data.displayData();                       
+                // jsPsych.data.displayData(); 
+
+                // get data values
+                var data = {experiment:"sceneWheel_main",
+                            repo:"sceneWheel_main",
+                            data:jsPsych.data.get().values(),
+                            browser_info:browser_info,
+                            interaction_data:jsPsych.data.getInteractionData().values(),
+                            exp_condition:condition}
+
+                // send data to savejs
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
+                xhr.setRequestHeader('Content-Type','application/json');
+                xhr.onload = function(){
+                  if(xhr.status==200){
+                    var response=JSON.parse(xhr.responseText);
+                    console.log(response.success);
+                  }
+                };
+                xhr.send(JSON.stringify(data));   
+
+                // send data to firebase                      
                 var tmp = new Uint32Array(1);
                 tmp = window.crypto.getRandomValues(tmp)
                 var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
