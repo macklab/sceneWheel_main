@@ -277,13 +277,13 @@
             timeline.push(test_break);
         }
         timeline.push(eval('main_block'+(n_block)));
-        timeline.push(demographic_page);
         // fullscreen out
         timeline.push({
             type: 'fullscreen',
             fullscreen_mode: false,
             data: {disp_type: 'fullscreen_out'}
-        });        
+        });
+        timeline.push(demographic_page);                
         timeline.push(debrief_page);  
         
 
