@@ -261,29 +261,29 @@
 
         // * timeline fill up * //  
         timeline = [];      
-        // timeline.push(consent_inst);
-        // timeline.push(consent_page);        
-        // // full screen mode        
-        // timeline.push({
-        //     type: 'fullscreen',
-        //     fullscreen_mode: true,
-        //     data: {disp_type: 'fullscreen_enter'}
-        // });
-        // timeline.push(general_instruction);
+        timeline.push(consent_inst);
+        timeline.push(consent_page);        
+        // full screen mode        
+        timeline.push({
+            type: 'fullscreen',
+            fullscreen_mode: true,
+            data: {disp_type: 'fullscreen_enter'}
+        });
+        timeline.push(general_instruction);
         timeline.push(practice_block);
-        // timeline.push(start_main);
-        // for (b=0; b<n_block-1; b++) {          
-        //     timeline.push(eval('main_block'+(b+1)));
-        //     timeline.push(test_break);
-        // }
-        // timeline.push(eval('main_block'+(n_block)));
-        // timeline.push(demographic_page);
-        // // fullscreen out
-        // timeline.push({
-        //     type: 'fullscreen',
-        //     fullscreen_mode: false,
-        //     data: {disp_type: 'fullscreen_out'}
-        // });        
+        timeline.push(start_main);
+        for (b=0; b<n_block-1; b++) {          
+            timeline.push(eval('main_block'+(b+1)));
+            timeline.push(test_break);
+        }
+        timeline.push(eval('main_block'+(n_block)));
+        timeline.push(demographic_page);
+        // fullscreen out
+        timeline.push({
+            type: 'fullscreen',
+            fullscreen_mode: false,
+            data: {disp_type: 'fullscreen_out'}
+        });        
         timeline.push(debrief_page);  
         
 
